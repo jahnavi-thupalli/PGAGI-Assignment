@@ -20,3 +20,65 @@ TalentScout-Hiring-Assistant/
 ├── requirements.txt    # Python dependencies
 ├── .env.example        # Template for necessary environment variables
 └── README.md           # Project documentation
+```
+
+---
+
+## Installation and Set Up
+**Prerequisites:** Python 3.8+, a Groq API key
+
+1. **Clone the repository:**
+   `git clone <your-repository-url>`
+   `cd TalentScout-Hiring-Assistant`
+
+2. **Install dependencies:**
+   `pip install -r requirements.txt`
+
+3. **Environment Setup:**
+   Create a `.env` file in the root directory based on the `.env.example` template:
+   `GROQ_API_KEY=your_groq_api_key_here`
+
+5. **Run the Application:**
+   `streamlit run app.py`
+
+---
+
+## Usage Guide
+1. Launch the Streamlit app in your browser using the local host link or Ngrok URL.
+2. The bot will greet you and ask for your details one by one (Name, Email, Phone, Experience, Position, Location).
+3. Provide your Tech Stack (e.g., "Python, AWS, React").
+4. The bot will instantly generate 3-5 technical questions and ask them sequentially.
+5. Answer the questions naturally. 
+6. Type an exit keyword like "exit" or "quit" at any time to end the session and save your application data to `candidates.json`.
+
+---
+
+## Technical Details & Architecture
+* **Frontend UI:** Streamlit handles the conversational UI and manages `st.session_state` to track the interview phases without losing context.
+* **LLM Provider:** Groq Cloud is used for ultra-low latency inference, ensuring a real-time chat experience.
+* **Model:** `llama-3.1-8b-instant` for high-quality, fast technical question generation.
+* **Data Handling:** Standard Python `json` library for local storage, combined with `validators` and `re` (Regex) modules for data sanitization.
+
+---
+
+## Prompt Design
+The intelligence of the assistant relies on structured prompt engineering, housed in `prompts.py`:
+
+1. **System Persona (`SYSTEM_PROMPT`):** Establishes the bot as an "expert technical recruiter" and enforces strict behavioral rules.
+2. **Dynamic Context Injection:** The `generate_questions_prompt` dynamically injects the tech stack, years of experience, and desired position to adjust the difficulty and relevance of the technical questions.
+3. **Few-Shot Formatting:** To ensure the Streamlit app can accurately parse the LLM's output into an iterable list, the prompt explicitly demands a specific format (starting every line with `Q:`) and forbids conversational filler.
+
+---
+
+## Challenges & Solutions
+* **Challenge 1: Managing Conversation Continuity (State Machine)**
+  * *Issue:* The chatbot initially struggled to distinguish between gathering basic information and conducting the technical interview, leading to looping fallback prompts.
+  * *Solution:* Implemented a strict `st.session_state.step` counter. The app only triggers the LLM API call exactly at Step 6 (after the tech stack is provided) and then shifts the UI logic to iterate through a cached list of questions.
+* **Challenge 2: Unpredictable LLM Output Parsing**
+  * *Issue:* The LLM occasionally included conversational filler, breaking the one-by-one question delivery system.
+  * *Solution:* Refined the prompt formatting constraints and built a robust fallback parser in `app.py` that splits text by the forced `Q:` prefix, or falls back to line-length parsing if the prefix is dropped.
+
+---
+
+## Data Privacy 
+In compliance with standard data privacy practices, no API keys are hardcoded into the repository. Candidate data is sanitized, validated, and stored locally in a simulated backend (`candidates.json`) rather than being printed to open console logs.
