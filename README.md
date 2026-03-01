@@ -1,6 +1,5 @@
 # PGAGI Assignment - TalentScout: Intelligent Hiring Assistant
 
-## Project Overview
 TalentScout is an AI-powered recruitment chatbot designed to streamline the top-of-funnel hiring process for a tech recruitment agency. It acts as an automated first-round interviewer by gathering essential candidate information and conducting a dynamic, context-aware technical screening based on the candidate's specific tech stack, desired position, and years of experience.
 
 ### Key Features
